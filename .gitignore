@@ -1,0 +1,9 @@
+./data_txt/*
+./head_data/*
+./log/*
+./logs/*
+./__pycache__
+./.git
+./.idea
+./test_model/*
+*.pth
