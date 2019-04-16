@@ -56,6 +56,16 @@ def WarmAndReduce_LR(optimizer,base_learning_rate,max_epoch,
                      use_warmup=True,
                      start_learning_rate=1e-5,
                      warmup_epoch=5):
+    """ Create an Reduce Learning Rate with or without warm up.
+
+    Args:
+        optimizer (Optimizer): Wrapped optimizer.
+        base_learning_rate: The basic learning rate ,the same as the regular learning rate.
+        max_epoch: The max epoch of training
+        use_warmup: Use warm up or not
+        start_learning_rate: is active when the use_warmup is True .If active ,it must be the same as the optimizer learning rate.
+        warmup_epoch: The epoch to use warm up.
+    """
     if(use_warmup):
         ReduceScheduler = ReducePlateauScheduler(optimizer, max_epoch)
         WarmUpScheduler = GradualWarmupScheduler(optimizer, multiplier=int(base_learning_rate / start_learning_rate),

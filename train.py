@@ -185,9 +185,15 @@ def main():
                               start_learning_rate=cfg.start_learning_rate,
                               warmup_epoch=cfg.warmup_epoch)
     if cfg.start_epoch != 0:
-        checkpoint = torch.load('./log/checkpoint_epoch{}.pth'.format(cfg.start_epoch-1))
+        checkpoint = torch.load('./log/checkpoint_epoch{}.pth'.format(cfg.start_epoch-1),map_location='cuda:0')
         print("Load weights from {}".format('./log/checkpoint_epoch{}.pth'.format(cfg.start_epoch-1)))
-        model.load_state_dict(checkpoint['state_dict'])
+        if cfg.del_classifier:
+            model_dict = model.state_dict()
+            checkpoint['state_dict'] = {k: v for k, v in checkpoint['state_dict'].items() if k in model_dict}
+            model_dict.update()
+            model.load_state_dict(model_dict)
+        else:
+            model.load_state_dict(checkpoint['state_dict'])
     for epoch in range(cfg.start_epoch, cfg.num_epochs + cfg.start_epoch):
         scheduler.step()
         print(80 * '=')
