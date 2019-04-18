@@ -81,13 +81,13 @@ if __name__ == '__main__':
     lr = []
     base_learning_rate = 0.01
     start_learning_rate = 0.0001
-    max_epoch = 10000
+    max_epoch = 100
     warmup_epoch = 1000
     optimizer = torch.optim.SGD([torch.zeros(10)],lr=base_learning_rate)
     WarmUp = WarmAndReduce_LR(optimizer,base_learning_rate,max_epoch,use_warmup=False)
     # ReduceScheduler = ReducePlateauScheduler(optimizer,max_epoch)
     # WarmUp = GradualWarmupScheduler(optimizer,multiplier=int(base_learning_rate/start_learning_rate),total_epoch=1000,after_scheduler=ReduceScheduler)
-    for epoch in range(1,10000):
+    for epoch in range(1,100):
         WarmUp.step(epoch)
         lr.append(optimizer.param_groups[0]['lr'])
     plt.plot(np.arange(len(lr)),lr)

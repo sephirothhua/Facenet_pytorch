@@ -202,7 +202,7 @@ def main():
         else:
             model.load_state_dict(checkpoint['state_dict'])
     for epoch in range(cfg.start_epoch, cfg.num_epochs + cfg.start_epoch):
-        scheduler.step()
+        # scheduler.step()
         print(80 * '=')
         print('Epoch [{}/{}] Learning Rate:{:8f}'.format(epoch, cfg.num_epochs + cfg.start_epoch - 1,scheduler.get_lr()[0]))
 
