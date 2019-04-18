@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Time    : 19-4-18 下午4:35
+# @Author  : Altair
+# @FileName: w.py
+# @Software: PyCharm
+# @email   : 641084377@qq.com
 from torch.optim.lr_scheduler import _LRScheduler
 import numpy as np
 

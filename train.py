@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Time    : 19-4-18 下午4:35
+# @Author  : Altair
+# @FileName: w.py
+# @Software: PyCharm
+# @email   : 641084377@qq.com
 import numpy as np
 import argparse
 import torch
@@ -15,22 +21,31 @@ from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 from lr_scheduler import WarmAndReduce_LR
 
+
+######################### Set the configration #############################
+# The device for train : change the cuda device for your train
 device  = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
+# The Configration for the model. Change the Config.py for your own set.
 cfg = Config()
+# The data path of your data.
 data_path = './data_txt'
+# The logger path for your log dir.
 log_dir = "./logs/face_log001"
 writer = SummaryWriter(log_dir=log_dir)
+# The test data path of your data. The classifier results will be write in the logger.
 TestData = test_data('./data_txt',img_size=cfg.image_size)
+############################################################################
 
-
-TL_loss = TripletLoss(cfg.margin)
-CE_loss = nn.CrossEntropyLoss()
+########################## The Loss Functions ##############################
+TL_loss = TripletLoss(cfg.margin) # The triplet loss of model
+CE_loss = nn.CrossEntropyLoss()   # The cross entropy loss of model
+############################################################################
 
 
 def train_valid(model, optimizer, scheduler, epoch, dataloaders, data_size):
     for phase in ['train', 'valid']:
-
+    # One step for train or valid
         labels, distances = [], []
         triplet_loss_sum = 0.0
         crossentropy_loss_sum = 0.0
