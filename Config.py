@@ -6,14 +6,15 @@ class Config():
     num_workers = 1
     margin = 0.5
 
-    start_epoch = 85
+    start_epoch = 0
     num_epochs = 100
 
     base_learning_rate = 0.01
     start_learning_rate = 1e-5
     warmup_epoch = 5
-    use_warmup = True
+    use_warmup = False
 
     image_size = 56
 
-    del_classifier = True
+    del_classifier = False
+    triplet_lambuda = 5

@@ -2,6 +2,8 @@ data_txt/*
 head_data/*
 log/*
 logs/*
+engine/*
+onnx_model/*
 __pycache__/
 .git
 .idea

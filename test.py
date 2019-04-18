@@ -1,6 +1,7 @@
 import torch
 from Config import Config
-from face_model import FaceNetModel
+from ONNX_model import FaceNetModel
+# from face_model import FaceNetModel
 from torchvision import transforms as T
 from PIL import Image
 import numpy as np
@@ -10,10 +11,15 @@ import os
 cfg = Config()
 device  = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-model = FaceNetModel(embedding_size = cfg.embedding_size, num_classes = cfg.num_classes).to(device)
-model_train = torch.load('./test_model/checkpoint_epoch84.pth', map_location='cuda:0')
-model.load_state_dict(model_train['state_dict'])
-
+# model = FaceNetModel(embedding_size = cfg.embedding_size).to(device)
+model = FaceNetModel(embedding_size = cfg.embedding_size).to(device)
+# model_train = torch.load('./test_model/checkpoint_epoch220.pth', map_location='cuda:0')
+# model.load_state_dict(model_train['state_dict'])
+model_dict = model.state_dict()
+checkpoint = torch.load('./test_model/checkpoint_epoch220.pth',map_location='cuda:0')
+checkpoint['state_dict'] = {k: v for k, v in checkpoint['state_dict'].items() if k in model_dict}
+model_dict.update(checkpoint['state_dict'])
+model.load_state_dict(model_dict)
 model.eval()
 
 # transform = T.Compose([
@@ -102,7 +108,6 @@ for file in woman_dict['20']:
 plt.plot(range(0,len(man_result)),man_result,'b-')
 plt.plot(range(len(man_result),len(man_result)+len(woman_result)),woman_result,'r-')
 plt.show()
-
 
 
 

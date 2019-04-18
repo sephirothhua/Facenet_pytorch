@@ -93,6 +93,7 @@ def train_valid(model, optimizer, scheduler, epoch, dataloaders, data_size):
                     neg_img_pred = model.forward_classifier(neg_hard_img).to(device)
 
                     triplet_loss = TL_loss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed).to(device)
+                    triplet_loss *= cfg.triplet_lambuda
                     predicted_labels = torch.cat([anc_img_pred, pos_img_pred, neg_img_pred])
                     true_labels = torch.cat([pos_hard_cls, pos_hard_cls,neg_hard_cls]).squeeze()
                     crossentropy_loss = CE_loss(predicted_labels,true_labels).to(device)
@@ -178,19 +179,25 @@ def train_valid(model, optimizer, scheduler, epoch, dataloaders, data_size):
 
 def main():
     model     = FaceNetModel(embedding_size = cfg.embedding_size, num_classes = cfg.num_classes).to(device)
-    optimizer = optim.Adam(model.parameters(), lr = cfg.start_learning_rate)
-    # scheduler = lr_scheduler.StepLR(optimizer, step_size = 50, gamma = 0.1)
-    scheduler = WarmAndReduce_LR(optimizer,cfg.base_learning_rate,cfg.num_epochs,
-                              use_warmup=True,
-                              start_learning_rate=cfg.start_learning_rate,
-                              warmup_epoch=cfg.warmup_epoch)
+    if cfg.use_warmup:
+        optimizer = optim.Adam(model.parameters(), lr = cfg.start_learning_rate)
+        # scheduler = lr_scheduler.StepLR(optimizer, step_size = 50, gamma = 0.1)
+        scheduler = WarmAndReduce_LR(optimizer,cfg.base_learning_rate,cfg.num_epochs,
+                                  use_warmup=cfg.use_warmup,
+                                  start_learning_rate=cfg.start_learning_rate,
+                                  warmup_epoch=cfg.warmup_epoch)
+    else:
+        optimizer = optim.Adam(model.parameters(), lr = cfg.base_learning_rate)
+        # scheduler = lr_scheduler.StepLR(optimizer, step_size = 50, gamma = 0.1)
+        scheduler = WarmAndReduce_LR(optimizer,cfg.base_learning_rate,cfg.num_epochs,
+                                  use_warmup=cfg.use_warmup)
     if cfg.start_epoch != 0:
         checkpoint = torch.load('./log/checkpoint_epoch{}.pth'.format(cfg.start_epoch-1),map_location='cuda:0')
         print("Load weights from {}".format('./log/checkpoint_epoch{}.pth'.format(cfg.start_epoch-1)))
         if cfg.del_classifier:
             model_dict = model.state_dict()
             checkpoint['state_dict'] = {k: v for k, v in checkpoint['state_dict'].items() if k in model_dict}
-            model_dict.update()
+            model_dict.update(checkpoint['state_dict'])
             model.load_state_dict(model_dict)
         else:
             model.load_state_dict(checkpoint['state_dict'])
